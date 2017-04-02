@@ -40,12 +40,12 @@ CREATE TABLE Vorlesungen (
 INSERT INTO Vorlesungen (VorlesungsNr, Titel, ECTS, Semester)
 VALUES
   (121, 'Programmieren',    4, 'hs10'),
-  (124, 'Datenbanken',      4, 'fs10'),
-  (128, 'Datenbanken',      4, 'fs11'),
+  (124, 'Datenbanken',      5, 'fs10'),
+  (128, 'Datenbanken',      5, 'fs11'),
   (123, 'Programmieren',    4, 'hs11'),
   (127, 'Programmieren',    4, 'hs12'),
-  (129, 'Datenbanken',      4, 'fs12'),
-  (135, 'Automatentheorie', 4, 'fs14')
+  (129, 'Datenbanken',      5, 'fs12'),
+  (135, 'Automatentheorie', 5, 'fs14')
 ;
 
 -- What kinda name is this?
