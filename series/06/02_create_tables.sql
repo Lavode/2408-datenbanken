@@ -1,3 +1,6 @@
+-- Marcel Zauder, 16-124-836
+-- Michael Senn,  16-126-880
+
 DROP TABLE IF EXISTS HaeltBetreut;
 DROP TABLE IF EXISTS Angestellte;
 DROP TABLE IF EXISTS Vorlesungen;
@@ -26,6 +29,8 @@ VALUES
 ;
 
 CREATE TABLE Vorlesungen (
+	-- Would like to use a sequence here, but doesn't fit well with the
+	-- data we're given.
 	VorlesungsNr INTEGER      PRIMARY KEY,
 	Titel        VARCHAR(255) NOT NULL,
 	ECTS         INTEGER      NOT NULL,

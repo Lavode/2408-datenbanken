@@ -1,15 +1,18 @@
-SELECT a.*
+-- Marcel Zauder, 16-124-836
+-- Michael Senn,  16-126-880
 
-FROM Vorlesungen AS v
+SELECT Angestellte.*
 
-LEFT JOIN HaeltBetreut AS hb
-       ON hb.VorlesungsNr = v.VorlesungsNr
+FROM Vorlesungen
 
-LEFT JOIN Angestellte AS a
-       ON a.PersonalNr = hb.PersonalNr
+LEFT JOIN HaeltBetreut
+       ON HaeltBetreut.VorlesungsNr = Vorlesungen.VorlesungsNr
 
-WHERE v.Titel = 'Programmieren'
-  AND a.Typ   = 'Assistent'
+LEFT JOIN Angestellte
+       ON Angestellte.PersonalNr = HaeltBetreut.PersonalNr
+
+WHERE Vorlesungen.Titel = 'Programmieren'
+  AND Angestellte.Typ   = 'Assistent'
 ;
 
 
@@ -22,18 +25,18 @@ WHERE semester = 'fs11'
 ;
 
 
-SELECT DISTINCT v.ECTS,
-                v.Titel
+SELECT DISTINCT Vorlesungen.ECTS,
+                Vorlesungen.Titel
 
-FROM Vorlesungen AS v
+FROM Vorlesungen
 
-LEFT JOIN HaeltBetreut AS hb
-       ON hb.VorlesungsNr = v.VorlesungsNr
+LEFT JOIN HaeltBetreut
+       ON HaeltBetreut.VorlesungsNr = Vorlesungen.VorlesungsNr
 
-LEFT JOIN Angestellte AS a
-       ON a.PersonalNr = hb.PersonalNr
+LEFT JOIN Angestellte
+       ON Angestellte.PersonalNr = HaeltBetreut.PersonalNr
 
-WHERE a.Name = 'Zauder'
-  AND a.Typ  = 'Professor'
+WHERE Angestellte.Name = 'Zauder'
+  AND Angestellte.Typ  = 'Professor'
 ;
 
