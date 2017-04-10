@@ -1,3 +1,6 @@
+-- Marcel Zauder, 16-124-836
+-- Michael Senn,  16-126-880
+
 SELECT DISTINCT filiale.filialleiter
 
 FROM lieferant
