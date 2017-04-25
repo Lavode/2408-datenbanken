@@ -1,3 +1,6 @@
+-- Marcel Zauder, 16-124-836
+-- Michael Senn,  16-126-880
+
 DROP TABLE IF EXISTS "hat-bei";
 
 ALTER TABLE Haustier DROP CONSTRAINT haustier_pid_fkey;
