@@ -1,0 +1,172 @@
+DROP TABLE IF EXISTS "hat-bei";
+
+DROP TABLE IF EXISTS FutterHaustier;
+DROP TABLE IF EXISTS Futter;
+
+DROP TABLE IF EXISTS Hund;
+DROP TABLE IF EXISTS Katze;
+DROP TABLE IF EXISTS Haustier;
+
+DROP TABLE IF EXISTS Kamin;
+DROP TABLE IF EXISTS Karton;
+DROP TABLE IF EXISTS Laptop;
+DROP TABLE IF EXISTS Lieblingsplatz;
+
+DROP TABLE IF EXISTS Halter;
+DROP TABLE IF EXISTS Aufpasser;
+DROP TABLE IF EXISTS Person;
+
+CREATE TABLE Lieblingsplatz (
+	lid SERIAL PRIMARY KEY
+)
+;
+
+CREATE TABLE Kamin (
+	lid      INTEGER      PRIMARY KEY,
+	Material VARCHAR(64) NOT NULL,
+
+	FOREIGN KEY (lid)
+	  REFERENCES Lieblingsplatz (lid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+CREATE TABLE Karton (
+	lid INTEGER PRIMARY KEY,
+
+	FOREIGN KEY (lid)
+	  REFERENCES Lieblingsplatz (lid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+CREATE TABLE Laptop (
+	lid           INTEGER     PRIMARY KEY,
+	Hersteller    VARCHAR(64) NOT NULL,
+	Kennzeichnung VARCHAR(64) NOT NULL,
+
+	FOREIGN KEY (lid)
+	  REFERENCES Lieblingsplatz (lid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+
+CREATE TABLE Person (
+	pid     SERIAL      PRIMARY KEY,
+	Name    VARCHAR(64) NOT NULL,
+	Wohnort VARCHAR(64) NOT NULL
+)
+;
+
+CREATE TABLE Halter (
+	pid INTEGER     PRIMARY KEY,
+	Typ VARCHAR(64) NOT NULL,
+
+	FOREIGN KEY (pid)
+	  REFERENCES Person (pid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+CREATE TABLE Aufpasser (
+	pid         INTEGER PRIMARY KEY,
+	Stundenlohn INTEGER, /* NULL in case of volunteers */
+
+	FOREIGN KEY (pid)
+	  REFERENCES Person (pid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+
+CREATE TABLE Haustier (
+	hid      SERIAL      PRIMARY KEY,
+	Name     VARCHAR(64) NOT NULL,
+	GebTag   INTEGER     NOT NULL,
+	GebMonat INTEGER     NOT NULL,
+	GebJahr  INTEGER     NOT NULL
+)
+;
+
+CREATE TABLE Hund (
+	hid   INTEGER     PRIMARY KEY,
+	Rasse VARCHAR(64) NOT NULL,
+
+	FOREIGN KEY (hid)
+	  REFERENCES Haustier (hid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+CREATE TABLE Katze (
+	hid       INTEGER     PRIMARY KEY,
+	Dominanz  INTEGER     NOT NULL,
+	Fellfarbe VARCHAR(64) NOT NULL,
+
+	FOREIGN KEY (hid)
+	  REFERENCES Haustier (hid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+
+CREATE TABLE Futter (
+	fid        SERIAL PRIMARY KEY,
+	Hersteller VARCHAR(64) NOT NULL,
+	Name       VARCHAR(64) NOT NULL,
+
+	UNIQUE (Hersteller, Name)
+)
+;
+
+CREATE TABLE FutterHaustier (
+	fid INTEGER NOT NULL,
+	hid INTEGER NOT NULL,
+
+	PRIMARY KEY (fid, hid),
+
+	FOREIGN KEY (fid)
+	  REFERENCES Futter (fid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE,
+
+	FOREIGN KEY (hid)
+	  REFERENCES Haustier (hid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+
+/* Seriously? `hat-bei`? */
+CREATE TABLE "hat-bei" (
+	hid INTEGER NOT NULL,
+	pid INTEGER NOT NULL,
+	lid INTEGER NOT NULL,
+
+	PRIMARY KEY (hid, pid),
+
+	FOREIGN KEY (hid)
+	  REFERENCES Haustier (hid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE,
+
+	FOREIGN KEY (pid)
+	  REFERENCES Person (pid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE,
+
+	FOREIGN KEY (lid)
+	  REFERENCES Lieblingsplatz (lid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
