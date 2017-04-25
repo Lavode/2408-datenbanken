@@ -44,6 +44,10 @@ DROP TABLE IF EXISTS Lieblingsplatz;
  *
  *   Such a solution ensures disjointness with basic and well-supported SQL
  *   features alone, and can easily be extended with new subtypes.
+ *
+ * > The "Every animal has at least one haunt", and "every animal has at least
+ *   one food it likes" would likely require the use of triggers in order to
+ *   implement within PostgreSQL.
  */
 
 CREATE TABLE Lieblingsplatz (
@@ -106,6 +110,20 @@ CREATE TABLE Haustier (
 	GebMonat INTEGER     NOT NULL
 	  CHECK (GebMonat >= 1 AND GebMonat <= 12),
 	GebJahr  INTEGER     NOT NULL /* Negative values are BC, positive AD */
+
+	/* Ensure every animal has at least one haunt.
+	/* Mind that this is not valid in Postgres, due to a) subqueries in
+	 * CHECK constraint, and b) CHECK not being deferrable. Instead, this
+	 * would likely have to be realised as a trigger.
+	, CHECK DEFERRED ((SELECT COUNT(1) FROM "hat-bei" WHERE "hat-bei".hid = hid) >= 1)
+	*/
+
+	/* Ensure every animal has at least one food it likes.
+	/* Mind that this is not valid in Postgres, due to a) subqueries in
+	 * CHECK constraint, and b) CHECK not being deferrable. Instead, this
+	 * would likely have to be realised as a trigger.
+	, CHECK DEFERRED ((SELECT COUNT(1) FROM FutterHaustier WHERE FutterHaustier.hid = hid) >= 1)
+	*/
 )
 ;
 
