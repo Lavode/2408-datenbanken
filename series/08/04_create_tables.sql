@@ -1,5 +1,9 @@
 DROP TABLE IF EXISTS "hat-bei";
 
+DROP TABLE IF EXISTS Halter;
+DROP TABLE IF EXISTS Aufpasser;
+DROP TABLE IF EXISTS Person;
+
 DROP TABLE IF EXISTS FutterHaustier;
 DROP TABLE IF EXISTS Futter;
 
@@ -12,9 +16,31 @@ DROP TABLE IF EXISTS Karton;
 DROP TABLE IF EXISTS Laptop;
 DROP TABLE IF EXISTS Lieblingsplatz;
 
-DROP TABLE IF EXISTS Halter;
-DROP TABLE IF EXISTS Aufpasser;
-DROP TABLE IF EXISTS Person;
+/* NOTE
+ * > The Person - Halter - Haustier relation which is part of the requirements
+ *   implies that a person can at most have one pet. (Person : Halter is 1:1,
+ *   Halter : Haustier is 1:1)
+
+ * > The expected solution is a poor implementation of disjoint subtypes 
+ *   Downsides of this solution are:
+ *   - Usage of non-supported CHECK constraints to ensure that e.g. an animal
+ *     is either cat or dog, not both.
+ *   - Each added subtype requiring one new check on each subtype's table
+ * 
+ *   A better solution would be - using the example of various types of animal:
+ *   - Introduce an AnimalType table
+ *   - Use an Animal table with:
+ *     - animal_id, animal_type columns
+ *     - (animal_id, animal_type) PK
+ *     - animal_type -> AnimalType FK
+ *   - Use one table per subtype with:
+ *     - animal_id, animal_type columns, with animal_type *fixed per table*
+ *     - animal_id PK
+ *     - (animal_id, animal_type) -> Animal FK
+ *
+ *   Such a solution ensures disjointness with basic and well-supported SQL
+ *   features alone, and can easily be extended with new subtypes.
+ */
 
 CREATE TABLE Lieblingsplatz (
 	lid SERIAL PRIMARY KEY
@@ -24,6 +50,10 @@ CREATE TABLE Lieblingsplatz (
 CREATE TABLE Kamin (
 	lid      INTEGER      PRIMARY KEY,
 	Material VARCHAR(64) NOT NULL,
+
+	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
+	/* CHECK ((SELECT COUNT(1) FROM Karton WHERE Karton.lid = lid) = 0), */
+	/* CHECK ((SELECT COUNT(1) FROM Laptop WHERE Laptop.lid = lid) = 0), */
 
 	FOREIGN KEY (lid)
 	  REFERENCES Lieblingsplatz (lid)
@@ -35,6 +65,10 @@ CREATE TABLE Kamin (
 CREATE TABLE Karton (
 	lid INTEGER PRIMARY KEY,
 
+	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
+	/* CHECK ((SELECT COUNT(1) FROM Kamin  WHERE Kamin.lid = lid)  = 0), */
+	/* CHECK ((SELECT COUNT(1) FROM Laptop WHERE Laptop.lid = lid) = 0), */
+
 	FOREIGN KEY (lid)
 	  REFERENCES Lieblingsplatz (lid)
 	  ON UPDATE CASCADE
@@ -45,7 +79,11 @@ CREATE TABLE Karton (
 CREATE TABLE Laptop (
 	lid           INTEGER     PRIMARY KEY,
 	Hersteller    VARCHAR(64) NOT NULL,
-	Kennzeichnung VARCHAR(64) NOT NULL,
+	Kennzeichnung VARCHAR(64)     NULL /* NULL if unknown */,
+
+	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
+	/* CHECK ((SELECT COUNT(1) FROM Kamin  WHERE Kamin.lid = lid)  = 0), */
+	/* CHECK ((SELECT COUNT(1) FROM Karton WHERE Karton.lid = lid) = 0), */
 
 	FOREIGN KEY (lid)
 	  REFERENCES Lieblingsplatz (lid)
@@ -55,48 +93,23 @@ CREATE TABLE Laptop (
 ;
 
 
-CREATE TABLE Person (
-	pid     SERIAL      PRIMARY KEY,
-	Name    VARCHAR(64) NOT NULL,
-	Wohnort VARCHAR(64) NOT NULL
-)
-;
-
-CREATE TABLE Halter (
-	pid INTEGER     PRIMARY KEY,
-	Typ VARCHAR(64) NOT NULL,
-
-	FOREIGN KEY (pid)
-	  REFERENCES Person (pid)
-	  ON UPDATE CASCADE
-	  ON DELETE CASCADE
-)
-;
-
-CREATE TABLE Aufpasser (
-	pid         INTEGER PRIMARY KEY,
-	Stundenlohn INTEGER, /* NULL in case of volunteers */
-
-	FOREIGN KEY (pid)
-	  REFERENCES Person (pid)
-	  ON UPDATE CASCADE
-	  ON DELETE CASCADE
-)
-;
-
-
 CREATE TABLE Haustier (
 	hid      SERIAL      PRIMARY KEY,
 	Name     VARCHAR(64) NOT NULL,
-	GebTag   INTEGER     NOT NULL,
-	GebMonat INTEGER     NOT NULL,
-	GebJahr  INTEGER     NOT NULL
+	GebTag   INTEGER     NOT NULL
+	  CHECK (GebTag >= 1 AND GebTag <= 31),
+	GebMonat INTEGER     NOT NULL
+	  CHECK (GebMonat >= 1 AND GebMonat <= 12),
+	GebJahr  INTEGER     NOT NULL /* Negative values are BC, positive AD */
 )
 ;
 
 CREATE TABLE Hund (
 	hid   INTEGER     PRIMARY KEY,
 	Rasse VARCHAR(64) NOT NULL,
+
+	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
+	/* CHECK ((SELECT COUNT(1) FROM Katze WHERE Katze.hid = hid) = 0), */
 
 	FOREIGN KEY (hid)
 	  REFERENCES Haustier (hid)
@@ -107,8 +120,11 @@ CREATE TABLE Hund (
 
 CREATE TABLE Katze (
 	hid       INTEGER     PRIMARY KEY,
-	Dominanz  INTEGER     NOT NULL,
+	Dominanz  INTEGER         NULL /* NULL if unkown */,
 	Fellfarbe VARCHAR(64) NOT NULL,
+
+	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
+	/* CHECK ((SELECT COUNT(1) FROM Hund WHERE Hund.hid = hid) = 0), */
 
 	FOREIGN KEY (hid)
 	  REFERENCES Haustier (hid)
@@ -146,7 +162,43 @@ CREATE TABLE FutterHaustier (
 ;
 
 
-/* Seriously? `hat-bei`? */
+CREATE TABLE Person (
+	pid     SERIAL      PRIMARY KEY,
+	Name    VARCHAR(64) NOT NULL,
+	Wohnort VARCHAR(64) NOT NULL
+)
+;
+
+CREATE TABLE Halter (
+	pid INTEGER     PRIMARY KEY,
+	hid INTEGER     NOT NULL,
+	Typ VARCHAR(64) NOT NULL,
+
+	FOREIGN KEY (pid)
+	  REFERENCES Person (pid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE,
+
+	FOREIGN KEY (hid)
+	  REFERENCES Haustier (hid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+CREATE TABLE Aufpasser (
+	pid         INTEGER PRIMARY KEY,
+	Stundenlohn INTEGER, /* NULL in case of volunteers */
+
+	FOREIGN KEY (pid)
+	  REFERENCES Person (pid)
+	  ON UPDATE CASCADE
+	  ON DELETE CASCADE
+)
+;
+
+
+/* Great example of how not to name your tables `hat-bei`? */
 CREATE TABLE "hat-bei" (
 	hid INTEGER NOT NULL,
 	pid INTEGER NOT NULL,
