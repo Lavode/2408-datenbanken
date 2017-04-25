@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS "hat-bei";
 
+ALTER TABLE Haustier DROP CONSTRAINT haustier_pid_fkey;
 DROP TABLE IF EXISTS Halter;
 DROP TABLE IF EXISTS Aufpasser;
 DROP TABLE IF EXISTS Person;
@@ -95,6 +96,7 @@ CREATE TABLE Laptop (
 
 CREATE TABLE Haustier (
 	hid      SERIAL      PRIMARY KEY,
+	pid      INTEGER     NOT NULL,
 	Name     VARCHAR(64) NOT NULL,
 	GebTag   INTEGER     NOT NULL
 	  CHECK (GebTag >= 1 AND GebTag <= 31),
@@ -184,6 +186,14 @@ CREATE TABLE Halter (
 	  ON UPDATE CASCADE
 	  ON DELETE CASCADE
 )
+;
+
+/* Ensure 1:1 between Haustier and Halter */
+ALTER TABLE Haustier
+  ADD FOREIGN KEY (pid)
+  REFERENCES Halter (pid)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 ;
 
 CREATE TABLE Aufpasser (
