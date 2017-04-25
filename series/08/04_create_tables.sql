@@ -229,7 +229,7 @@ CREATE TABLE Aufpasser (
 ;
 
 
-/* Great example of how not to name your tables `hat-bei`? */
+/* Great example of how not to name your tables */
 CREATE TABLE "hat-bei" (
 	hid INTEGER NOT NULL,
 	pid INTEGER NOT NULL,
