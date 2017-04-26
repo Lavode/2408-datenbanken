@@ -112,18 +112,18 @@ CREATE TABLE Haustier (
 	GebJahr  INTEGER     NOT NULL /* Negative values are BC, positive AD */
 
 	/* Ensure every animal has at least one haunt.
-	/* Mind that this is not valid in Postgres, due to a) subqueries in
+	 * Mind that this is not valid in Postgres, due to a) subqueries in
 	 * CHECK constraint, and b) CHECK not being deferrable. Instead, this
 	 * would likely have to be realised as a trigger.
-	, CHECK DEFERRED ((SELECT COUNT(1) FROM "hat-bei" WHERE "hat-bei".hid = hid) >= 1)
-	*/
+	 * , CHECK DEFERRED ((SELECT COUNT(1) FROM "hat-bei" WHERE "hat-bei".hid = hid) >= 1)
+	 */
 
 	/* Ensure every animal has at least one food it likes.
-	/* Mind that this is not valid in Postgres, due to a) subqueries in
+	 * Mind that this is not valid in Postgres, due to a) subqueries in
 	 * CHECK constraint, and b) CHECK not being deferrable. Instead, this
 	 * would likely have to be realised as a trigger.
-	, CHECK DEFERRED ((SELECT COUNT(1) FROM FutterHaustier WHERE FutterHaustier.hid = hid) >= 1)
-	*/
+	 * , CHECK DEFERRED ((SELECT COUNT(1) FROM FutterHaustier WHERE FutterHaustier.hid = hid) >= 1)
+	 */
 )
 ;
 
