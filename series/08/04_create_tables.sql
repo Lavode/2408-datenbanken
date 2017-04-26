@@ -60,8 +60,8 @@ CREATE TABLE Kamin (
 	Material VARCHAR(64) NOT NULL,
 
 	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
-	/* CHECK ((SELECT COUNT(1) FROM Karton WHERE Karton.lid = lid) = 0), */
-	/* CHECK ((SELECT COUNT(1) FROM Laptop WHERE Laptop.lid = lid) = 0), */
+	/* CHECK (NOT EXISTS (SELECT 1 FROM Karton WHERE Karton.lid = Kamin.lid)), */
+	/* CHECK (NOT EXISTS (SELECT 1 FROM Laptop WHERE Laptop.lid = Kamin.lid)), */
 
 	FOREIGN KEY (lid)
 	  REFERENCES Lieblingsplatz (lid)
@@ -74,8 +74,8 @@ CREATE TABLE Karton (
 	lid INTEGER PRIMARY KEY,
 
 	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
-	/* CHECK ((SELECT COUNT(1) FROM Kamin  WHERE Kamin.lid = lid)  = 0), */
-	/* CHECK ((SELECT COUNT(1) FROM Laptop WHERE Laptop.lid = lid) = 0), */
+	/* CHECK (NOT EXISTS (SELECT 1 FROM Kamin  WHERE Kamin.lid  = Karton.lid)), */
+	/* CHECK (NOT EXISTS (SELECT 1 FROM Laptop WHERE Laptop.lid = Karton.lid)), */
 
 	FOREIGN KEY (lid)
 	  REFERENCES Lieblingsplatz (lid)
@@ -90,8 +90,8 @@ CREATE TABLE Laptop (
 	Kennzeichnung VARCHAR(64)     NULL /* NULL if unknown */,
 
 	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
-	/* CHECK ((SELECT COUNT(1) FROM Kamin  WHERE Kamin.lid = lid)  = 0), */
-	/* CHECK ((SELECT COUNT(1) FROM Karton WHERE Karton.lid = lid) = 0), */
+	/* CHECK (NOT EXISTS (SELECT 1 FROM Kamin  WHERE Kamin.lid  = Laptop.lid)), */
+	/* CHECK (NOT EXISTS (SELECT 1 FROM Karton WHERE Karton.lid = Laptop.lid)), */
 
 	FOREIGN KEY (lid)
 	  REFERENCES Lieblingsplatz (lid)
@@ -115,15 +115,15 @@ CREATE TABLE Haustier (
 	 * Mind that this is not valid in Postgres, due to a) subqueries in
 	 * CHECK constraint, and b) CHECK not being deferrable. Instead, this
 	 * would likely have to be realised as a trigger.
-	 * , CHECK DEFERRED ((SELECT COUNT(1) FROM "hat-bei" WHERE "hat-bei".hid = hid) >= 1)
 	 */
+	 /* , CHECK DEFERRED (EXISTS (SELECT 1 FROM "hat-bei" WHERE "hat-bei".hid = Haustier.hid)) */
 
 	/* Ensure every animal has at least one food it likes.
 	 * Mind that this is not valid in Postgres, due to a) subqueries in
 	 * CHECK constraint, and b) CHECK not being deferrable. Instead, this
 	 * would likely have to be realised as a trigger.
-	 * , CHECK DEFERRED ((SELECT COUNT(1) FROM FutterHaustier WHERE FutterHaustier.hid = hid) >= 1)
 	 */
+	 /* , CHECK DEFERRED (EXISTS (SELECT 1 FROM FutterHaustier WHERE FutterHaustier.hid = Haustier.hid)) */
 )
 ;
 
@@ -132,7 +132,7 @@ CREATE TABLE Hund (
 	Rasse VARCHAR(64) NOT NULL,
 
 	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
-	/* CHECK ((SELECT COUNT(1) FROM Katze WHERE Katze.hid = hid) = 0), */
+	/* CHECK (EXISTS (SELECT 1 FROM Katze WHERE Katze.hid = Hund.hid)), */
 
 	FOREIGN KEY (hid)
 	  REFERENCES Haustier (hid)
@@ -147,7 +147,7 @@ CREATE TABLE Katze (
 	Fellfarbe VARCHAR(64) NOT NULL,
 
 	/* Ensure disjointedness. Mind that this is not valid in Postgres - check remark at top of file. */
-	/* CHECK ((SELECT COUNT(1) FROM Hund WHERE Hund.hid = hid) = 0), */
+	/* CHECK (EXISTS (SELECT 1 FROM Hund WHERE Hund.hid = Katze.hid)), */
 
 	FOREIGN KEY (hid)
 	  REFERENCES Haustier (hid)
