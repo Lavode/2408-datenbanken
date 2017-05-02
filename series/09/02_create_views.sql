@@ -1,6 +1,8 @@
 -- Marcel Zauder, 16-124-836
 -- Michael Senn,  16-126-880
 
+-- DB used: fs17_m.senn1_s06
+
 DROP VIEW IF EXISTS LieblingsFutter;
 DROP VIEW IF EXISTS cheapest_seller_per_food;
 DROP VIEW IF EXISTS favourite_food_per_species;

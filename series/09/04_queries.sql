@@ -1,6 +1,8 @@
 -- Marcel Zauder, 16-124-836
 -- Michael Senn,  16-126-880
 
+-- DB used: fs17_m.senn1_s06
+
 -- Manufacturer of food 'Stroh'
 SELECT hersteller.*
 
