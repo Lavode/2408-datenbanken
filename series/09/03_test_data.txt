@@ -1,0 +1,25 @@
+Test data must cover the following cases:
+
+- One species
+  - Ratings for two different types of food
+    - Different average rating
+=> Ensure the top-rated one shows up in view
+
+- One species
+  - Ratings for two different types of food
+    - Equal average rating
+=> Ensure both show up in view
+
+- One food
+  - No ratings (mag.grad IS NULL)
+=> Ensure it does not show up in view
+
+- One species
+  - Most liked food not sold by anyone
+=> Ensure it shows up in view
+
+- One food
+  - Top ratings for one species
+  - Sold by two manufacturers
+    - With different price
+=> Ensure the cheaper one shows up in view
