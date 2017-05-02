@@ -11,7 +11,7 @@ Test data must cover the following cases:
 => Ensure both show up in view
 
 - One food
-  - No ratings (mag.grad IS NULL)
+  - No ratings (mag.grad IS NULL / no entries at all)
 => Ensure it does not show up in view
 
 - One species
