@@ -31,3 +31,20 @@ WHERE ha_pkey IN (
 	HAVING max(grad) = min(grad)
 )
 ;
+
+
+SELECT array_agg(haustiere.name) AS "Haustiere",
+       futter.name               AS "Futter",
+       mag.grad                  AS "Gemeinsame Bewertung"
+
+FROM mag
+
+JOIN haustiere
+USING (ha_pkey)
+
+JOIN futter
+USING (f_pkey)
+
+GROUP BY futter.f_pkey,
+         grad
+;
